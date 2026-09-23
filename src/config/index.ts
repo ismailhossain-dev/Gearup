@@ -6,5 +6,6 @@ dotenv.config({
 });
 
 export default {
-    port: process.env.PORT
+    port: process.env.PORT,
+    bcrypt_salt_rounds : process.env.BCRYPT_SALT_ROUNDS
 }
