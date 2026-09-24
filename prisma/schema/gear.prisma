@@ -1,0 +1,18 @@
+model Gear {
+    id             String   @id @default(uuid())
+    name           String   @db.VarChar(255)
+    description    String
+    pricePerDay    Int
+    stock          Int
+    availableStock Int
+    brand          String?
+    isAvailable    Boolean  @default(true)
+    image          String?
+    //userId
+    providerId     String   @unique
+    user           User     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    @@map("gears")
+}
