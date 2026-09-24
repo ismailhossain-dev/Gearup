@@ -1,9 +1,51 @@
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { jwtUtilis } from "../../utils/jwt";
-import { IUserLoginPayload } from "./auth.interface";
+import { IUserLoginPayload, IUserPayload } from "./auth.interface";
 import bcrypt from "bcryptjs";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+
+const registerUserIntoDB = async (payload: IUserPayload) => {
+  const { name, email, password, profilePhoto, phone } = payload;
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (isUserExist) {
+    throw new Error("User with email already exists ");
+  }
+
+  const hashPassword = await bcrypt.hash(
+    password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  const createUser = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashPassword,
+      profilePhoto,
+      phone,
+    },
+  });
+
+  //user get for response
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: createUser.id,
+      email: createUser.email,
+    },
+    omit: {
+      password: true,
+    },
+  });
+
+  return user;
+};
 
 const loginUser = async (payload: IUserLoginPayload) => {
   const { email, password } = payload;
@@ -82,7 +124,14 @@ const refreshToken = async (refreshToken: string) => {
   return { accessToken };
 };
 
+
+const getMyProfileFromDB = async()=> {
+
+}
+
 export const authService = {
+  registerUserIntoDB,
   loginUser,
   refreshToken,
+  getMyProfileFromDB
 };

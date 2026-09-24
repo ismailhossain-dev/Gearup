@@ -4,12 +4,25 @@ import { authService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status"
 
+const registerUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+    const result = await authService.registerUserIntoDB(payload);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "User register successfully",
+      data: result,
+    });
+  },
+);
+
 const loginUser = catchAsync(async(req:Request, res:Response, next:NextFunction)=> {
     const payload = req.body; 
     const {accessToken, refreshToken} = await  authService.loginUser(payload);
 
     //set token in cokkie
-    res.cookie("accssToken", accessToken, {
+    res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: false, 
         sameSite: "none",
@@ -48,7 +61,20 @@ const refreshToken = catchAsync(async(req:Request, res:Response, next:NextFuncti
     })
 })
 
+
+const getMyProfile = catchAsync(async(req:Request, res:Response, next:NextFunction)=> {
+    const result = await authService.getMyProfileFromDB();
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "My profile retrived successfully",
+        data: result
+    })
+})
+
 export const authController = {
+    registerUser, 
     loginUser,
-    refreshToken
+    refreshToken,
+    getMyProfile
 }
