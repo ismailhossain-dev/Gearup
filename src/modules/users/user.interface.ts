@@ -1,4 +1,4 @@
-import { Role } from "../../../generated/prisma/enums";
+
 
 export interface IUserPayload {
   name: string;

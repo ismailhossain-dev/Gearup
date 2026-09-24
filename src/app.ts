@@ -3,6 +3,7 @@ const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { userRoutes } from "./modules/users/user.route";
+import { authRoutes } from "./modules/auth/auth.route";
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -22,5 +23,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", userRoutes)
+app.use("/api/auth", authRoutes)
 
 export default app;

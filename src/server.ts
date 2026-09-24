@@ -7,7 +7,7 @@ const main = async () => {
   console.log("Connected to the database successfully");
   try {
     app.listen(port, () => {
-      console.log(`Server is running on $${port}`);
+      console.log(`Server is running on ${port}`);
     });
   } catch (error) {
     console.log("Error starting the server", error);
