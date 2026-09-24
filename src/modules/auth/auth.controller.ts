@@ -63,7 +63,8 @@ const refreshToken = catchAsync(async(req:Request, res:Response, next:NextFuncti
 
 
 const getMyProfile = catchAsync(async(req:Request, res:Response, next:NextFunction)=> {
-    const result = await authService.getMyProfileFromDB();
+    const userId = req.user?.id; 
+    const result = await authService.getMyProfileFromDB(userId as string);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
