@@ -6,7 +6,6 @@ import config from "../config";
 import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 
-// req.user এর error solve করার জন্য
 declare global {
   namespace Express {
     interface Request {

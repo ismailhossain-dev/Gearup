@@ -1,3 +1,4 @@
+
 model Gear {
     id             String   @id @default(uuid())
     name           String   @db.VarChar(255)
@@ -10,9 +11,11 @@ model Gear {
     image          String?
     //userId
     providerId     String   @unique
+    //user relation
     user           User     @relation(fields: [providerId], references: [id], onDelete: Cascade)
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
-
+    review Review[]
+    category Category[]
     @@map("gears")
 }

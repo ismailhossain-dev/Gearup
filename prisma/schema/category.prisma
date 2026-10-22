@@ -1,0 +1,11 @@
+model Category {
+    id          String   @id @default(uuid())
+    providerId  String   @unique
+    gear        Gear     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+    name        String
+    description String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+
+    @@map("category")
+}
