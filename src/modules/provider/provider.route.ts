@@ -11,4 +11,10 @@ router.post(
   providerController.createGear,
 );
 
+router.put(
+  "/gear/:id",
+  auth(Role.ADMIN, Role.PROVIDER),
+  providerController.updateGear,
+);
+
 export const providerRoutes = router;
