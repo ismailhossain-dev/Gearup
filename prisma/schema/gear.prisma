@@ -1,21 +1,34 @@
-
+// Provider যেসব Equipment Rent দিতে চায়, সেগুলোর তথ্য ও Stock সংরক্ষণ করা।
 model Gear {
-    id             String   @id @default(uuid())
-    name           String   @db.VarChar(255)
+    id             String  @id @default(uuid())
+    name           String  @db.VarChar(255)
     description    String
+    brand          String?
+    image          String?
     pricePerDay    Int
     stock          Int
     availableStock Int
-    brand          String?
-    isAvailable    Boolean  @default(true)
-    image          String?
-    //userId
-    providerId     String   @unique
-    //user relation
-    user           User     @relation(fields: [providerId], references: [id], onDelete: Cascade)
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @updatedAt
+    isAvailable    Boolean @default(true)
+
+    //Provider Relation
+    providerId String
+    user       User   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+    // Category Relation
+    categoryId String
+    category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+    // Review Relation
     review Review[]
-    category Category[]
+    rentalOrder RentalOrder[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([providerId])
+    
+    @@index([categoryId])
+
     @@map("gears")
+
 }

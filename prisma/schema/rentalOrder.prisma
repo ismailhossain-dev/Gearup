@@ -1,0 +1,26 @@
+//RentalOrder	কে কোন Gear কত দিনের জন্য Rent করেছে tar information
+model RentalOrder {
+    id String @id @default(uuid())
+    customerId String
+    customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+    gearId String
+    gear Gear @relation(fields: [gearId], references: [id], onDelete: Cascade)
+
+    quantity Int @default(1)
+    
+    startDate DateTime
+    endDate DateTime
+
+    totalPrice Int
+
+    status RentalStatus @default(PENDING)
+
+    payment Payment?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([customerId])
+    @@index([gearId])
+    @@map("rental_orders")
+}

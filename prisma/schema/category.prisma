@@ -1,11 +1,12 @@
 model Category {
-    id          String   @id @default(uuid())
-    providerId  String   @unique
-    gear        Gear     @relation(fields: [providerId], references: [id], onDelete: Cascade)
-    name        String
-    description String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @default(now())
+    id          String  @id @default(uuid())
+    name        String  @unique @db.VarChar(100)
+    description String?
+    image       String?
 
-    @@map("category")
+    // Gear Relation 
+    gears Gear[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
