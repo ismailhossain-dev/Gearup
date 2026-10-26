@@ -10,6 +10,7 @@ import { reviewRoutes } from "./modules/review/review.route";
 import { adminRoutes } from "./modules/admin/admin.route";
 import { providerRoutes } from "./modules/provider/provider.route";
 import { paymentRoutes } from "./modules/payment/payment.route";
+import { paymentController } from "./modules/payment/payment.controller";
 
 app.use(
   cors({
@@ -17,7 +18,11 @@ app.use(
     credentials: true,
   }),
 );
-app.use("/api/subscription/webhook", express.raw({ type: "application/json" }));
+app.post(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.handleWebhook
+);
 
 app.use(cookieParser());
 app.use(express.json());

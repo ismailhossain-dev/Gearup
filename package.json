@@ -8,7 +8,8 @@
     "dev": "tsx watch src/server.js",
     "build": "tsc",
     "start": "node dist/server.ts",
-    "stripe:webhook": "stripe listen --events checkout.session.completed --forward-to localhost:5000/api/subscription/webhook"
+  "stripe:webhook": "stripe listen --events checkout.session.completed,checkout.session.async_payment_succeeded,checkout.session.async_payment_failed --forward-to http://localhost:5000/api/payments/webhook"
+  
   },
   "keywords": [],
   "author": "",

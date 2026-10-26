@@ -45,8 +45,6 @@ export const auth = (...requiredRoles: Role[]) => {
     // Get user information from token
     const { name, email, role, id } = verifyToken.data;
 
-    console.log("check role", role)
-
     // Check role
     if (requiredRoles.length && !requiredRoles.includes(role)) {
       throw new Error(

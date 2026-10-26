@@ -9,4 +9,6 @@ router.post(
   auth(Role.ADMIN, Role.CUSTOMER, Role.PROVIDER),
   paymentController.createCheckoutSession,
 );
+
+router.post("/confirm", paymentController.handleWebhook)
 export const paymentRoutes = router;
