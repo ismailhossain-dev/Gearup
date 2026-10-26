@@ -4,19 +4,6 @@ import { gearService } from "./gear.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
-const createGear = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const authorId = req.user?.id as string;
-    const payload = req.body;
-    const result = await gearService.createGear(payload, authorId);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.CREATED,
-      message: "Gear created successfully",
-      data: result,
-    });
-  },
-);
 
 const getAllGear = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -46,8 +33,20 @@ const getGearById = catchAsync(
   },
 );
 
+const getAllGearCategory = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await gearService.getAllGearCategory();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Retrived all category successfully",
+      data: result,
+    });
+  },
+);
+
 export const gearController = {
   getAllGear,
   getGearById,
-  createGear,
+  getAllGearCategory
 };

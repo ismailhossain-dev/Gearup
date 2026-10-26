@@ -7,7 +7,7 @@ const router = Router();
 router.get("/users", adminController.getAllUsers);
 router.patch("/users/:id", auth(Role.ADMIN), adminController.updateUser);
 
-router.get("/gear", adminController.getAllGears);
-router.get("/rentals", adminController.getAllRentals);
+router.get("/gear", auth(Role.ADMIN), adminController.getAllGears);
+router.get("/rentals", auth(Role.ADMIN), adminController.getAllRentals);
 
 export const adminRoutes = router;

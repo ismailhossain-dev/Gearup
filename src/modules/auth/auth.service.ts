@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
 const registerUserIntoDB = async (payload: IUserPayload) => {
-  const { name, email, password, profilePhoto, phone } = payload;
+  const { name, email, password, profilePhoto, phone, role } = payload;
   const isUserExist = await prisma.user.findUnique({
     where: {
       email,
@@ -29,6 +29,7 @@ const registerUserIntoDB = async (payload: IUserPayload) => {
       password: hashPassword,
       profilePhoto,
       phone,
+      role,
     },
   });
 
@@ -53,6 +54,8 @@ const loginUser = async (payload: IUserLoginPayload) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: { email },
   });
+
+  console.log("login user role ", user.role);
 
   const isPasswordMatched = await bcrypt.compare(password, user.password);
 
@@ -124,24 +127,22 @@ const refreshToken = async (refreshToken: string) => {
   return { accessToken };
 };
 
-
-const getMyProfileFromDB = async(userId:string)=> {
+const getMyProfileFromDB = async (userId: string) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
-      id: userId
+      id: userId,
     },
     omit: {
-      password: true
-    }
-  })
+      password: true,
+    },
+  });
 
-  return user; 
-
-}
+  return user;
+};
 
 export const authService = {
   registerUserIntoDB,
   loginUser,
   refreshToken,
-  getMyProfileFromDB
+  getMyProfileFromDB,
 };

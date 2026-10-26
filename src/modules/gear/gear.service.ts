@@ -1,43 +1,8 @@
 import { GearWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
-import { ICreateGear, IGearQuery } from "./gear.interface";
+import { IGearQuery } from "./gear.interface";
 
-const createGear = async (payload: ICreateGear, authorId: string) => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: authorId,
-    },
-  });
 
-  if (user.status !== "ACTIVE") {
-    throw new Error("Your account is suspended");
-  }
-
-  const result = await prisma.gear.create({
-    data: {
-      name: payload.name,
-      description: payload.description,
-      brand: payload.brand,
-      image: payload.image,
-      pricePerDay: payload.pricePerDay,
-      stock: payload.stock,
-      availableStock: payload.stock,
-      isAvailable: payload.stock > 0,
-
-      user: {
-        connect: { id: authorId },
-      },
-      category: {
-        connect: { id: payload.categoryId },
-      },
-    },
-    include: {
-      category: true,
-    },
-  });
-
-  return result;
-};
 
 const getAllGear = async (query: IGearQuery) => {
   const andConditions: GearWhereInput[] = [];
@@ -157,8 +122,19 @@ const getGearById = async (gearId: string) => {
   return result;
 };
 
+
+const getAllGearCategory = async()=> {
+  const result = await prisma.category.findMany({
+    include: {
+      gears: true
+    }
+  });
+
+  return result
+}
+
 export const gearService = {
   getAllGear,
   getGearById,
-  createGear,
+  getAllGearCategory
 };

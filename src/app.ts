@@ -8,6 +8,7 @@ import { categoryRoutes } from "./modules/category/category.route";
 import { rentalRoutes } from "./modules/rental/rental.route";
 import { reviewRoutes } from "./modules/review/review.route";
 import { adminRoutes } from "./modules/admin/admin.route";
+import { providerRoutes } from "./modules/provider/provider.route";
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -27,11 +28,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/categories", categoryRoutes)
-app.use("/api", gearRoutes)
-app.use("/api/rentals", rentalRoutes)
-app.use("/api/reviews", reviewRoutes)
-app.use("/api/admin", adminRoutes)
-
+app.use("/api/categories", categoryRoutes);
+app.use("/api", gearRoutes);
+app.use("/api/rentals", rentalRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/provider", providerRoutes);
 
 export default app;
