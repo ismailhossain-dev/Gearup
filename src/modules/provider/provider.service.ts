@@ -1,6 +1,6 @@
 import { prisma } from "../../lib/prisma";
 import { ICreateGear } from "../gear/gear.interface";
-import { IUpdateGear } from "./provider.interface";
+import { IUpdateGear, IUpdateOrderStatus } from "./provider.interface";
 
 const createGear = async (payload: ICreateGear, authorId: string) => {
   const user = await prisma.user.findUniqueOrThrow({
@@ -129,8 +129,157 @@ const deleteGear = async (gearId: string, providerId: string) => {
   return result;
 };
 
+const getProviderOrders = async (providerId: string) => {
+  const result = await prisma.rentalOrder.findMany({
+    where: {
+      gear: {
+        providerId,
+      },
+    },
+
+    include: {
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      },
+
+      gear: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          pricePerDay: true,
+          providerId: true,
+        },
+      },
+
+      payment: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
+
+const updateOrderStatus = async (
+  orderId: string,
+  providerId: string,
+  payload: IUpdateOrderStatus
+) => {
+  const allowedStatuses = [
+    "CONFIRMED",
+    "ACTIVE",
+    "COMPLETED",
+    "CANCELLED",
+  ] as const;
+
+  if (
+    !payload.status ||
+    !allowedStatuses.includes(payload.status as typeof allowedStatuses[number])
+  ) {
+    throw new Error("Invalid rental order status");
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    const order = await tx.rentalOrder.findFirst({
+      where: {
+        id: orderId,
+        gear: {
+          providerId,
+        },
+      },
+      include: {
+        payment: true,
+      },
+    });
+
+    if (!order) {
+      throw new Error("Rental order not found");
+    }
+
+    if (order.status === payload.status) {
+      throw new Error("Order already has this status");
+    }
+
+    // Define valid status transitions
+    const allowedTransitions: Record<string, string[]> = {
+      PENDING: ["CANCELLED"],
+      CONFIRMED: ["ACTIVE", "CANCELLED"],
+      ACTIVE: ["COMPLETED"],
+      COMPLETED: [],
+      CANCELLED: [],
+    };
+
+    if (
+      !allowedTransitions[order.status]?.includes(payload.status)
+    ) {
+      throw new Error(
+        `Cannot change order status from ${order.status} to ${payload.status}`
+      );
+    }
+
+    // Only paid orders can become active
+    if (
+      payload.status === "ACTIVE" &&
+      order.payment?.status !== "PAID"
+    ) {
+      throw new Error("Payment must be completed first");
+    }
+
+    // Return reserved stock on cancellation or completion
+    if (
+      payload.status === "CANCELLED" ||
+      payload.status === "COMPLETED"
+    ) {
+      await tx.gear.update({
+        where: {
+          id: order.gearId,
+        },
+        data: {
+          availableStock: {
+            increment: order.quantity,
+          },
+        },
+      });
+    }
+
+    const updatedOrder = await tx.rentalOrder.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        status: payload.status,
+      },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        gear: true,
+        payment: true,
+      },
+    });
+
+    return updatedOrder;
+  });
+
+  return result;
+};
 export const providerService = {
   createGear,
   updateGear,
-  deleteGear
+  deleteGear,
+  getProviderOrders,
+  updateOrderStatus
 };

@@ -7,7 +7,10 @@ const createCheckoutSession = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const customerId = req.user?.id as string;
     const { rentalOrderId } = req.body;
-    const result = await paymentService.createCheckoutSession(customerId, rentalOrderId);
+    const result = await paymentService.createCheckoutSession(
+      customerId,
+      rentalOrderId,
+    );
 
     sendResponse(res, {
       success: true,
@@ -35,13 +38,49 @@ const handleWebhook = catchAsync(async (req: Request, res: Response) => {
 
   sendResponse(res, {
     success: true,
-    statusCode: 200,
+    statusCode: httpStatus.CREATED,
     message: "webhook triggered successfully",
     data: result,
   });
-
 });
+
+const getMyPayments = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const customerId = req.user?.id as string;
+    const result = await paymentService.getMyPayments(customerId);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Payment history retrieved successfully",
+      data: result,
+    });
+  },
+);
+
+
+const getSinglePayment = catchAsync(
+  async (req: Request, res: Response) => {
+    const paymentId = req.params.id as string;
+    const customerId = req.user!.id;
+
+    const result = await paymentService.getSinglePayment(
+      paymentId,
+      customerId
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Payment details retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 export const paymentController = {
   createCheckoutSession,
   handleWebhook,
+  getMyPayments,
+  getSinglePayment
+  
 };

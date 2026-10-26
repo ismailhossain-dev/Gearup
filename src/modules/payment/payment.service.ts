@@ -112,7 +112,98 @@ const handleWebhook = async (
 };
 
 
+const getMyPayments = async (customerId: string) => {
+  const result = await prisma.payment.findMany({
+    where: {
+      rentalOrder: {
+        customerId,
+      },
+    },
+
+    include: {
+      rentalOrder: {
+        select: {
+          id: true,
+          quantity: true,
+          startDate: true,
+          endDate: true,
+          totalPrice: true,
+          status: true,
+
+          gear: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              pricePerDay: true,
+            },
+          },
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
+const getSinglePayment = async (
+  paymentId: string,
+  customerId: string
+) => {
+  const result = await prisma.payment.findFirst({
+    where: {
+      id: paymentId,
+      rentalOrder: {
+        customerId,
+      },
+    },
+
+    include: {
+      rentalOrder: {
+        select: {
+          id: true,
+          quantity: true,
+          startDate: true,
+          endDate: true,
+          totalPrice: true,
+          status: true,
+
+          gear: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              image: true,
+              brand: true,
+              pricePerDay: true,
+
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    throw new Error("Payment not found");
+  }
+
+  return result;
+};
+
 export const paymentService = {
   createCheckoutSession,
-  handleWebhook
+  handleWebhook,
+  getMyPayments,
+  getSinglePayment,
 };

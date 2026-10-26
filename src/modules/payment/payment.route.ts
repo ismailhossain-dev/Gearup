@@ -10,5 +10,19 @@ router.post(
   paymentController.createCheckoutSession,
 );
 
-router.post("/confirm", paymentController.handleWebhook)
+router.post("/confirm", paymentController.handleWebhook);
+
+router.get(
+  "/",
+  auth(Role.ADMIN, Role.CUSTOMER, Role.PROVIDER),
+  paymentController.getMyPayments,
+);
+
+router.get(
+  "/:id",
+  auth(Role.ADMIN, Role.CUSTOMER, Role.PROVIDER),
+  paymentController.getSinglePayment,
+);
+
+
 export const paymentRoutes = router;
