@@ -9,12 +9,15 @@ import { rentalRoutes } from "./modules/rental/rental.route";
 import { reviewRoutes } from "./modules/review/review.route";
 import { adminRoutes } from "./modules/admin/admin.route";
 import { providerRoutes } from "./modules/provider/provider.route";
+import { paymentRoutes } from "./modules/payment/payment.route";
+
 app.use(
   cors({
     origin: "http://localhost:3000",
     credentials: true,
   }),
 );
+app.use("/api/subscription/webhook", express.raw({ type: "application/json" }));
 
 app.use(cookieParser());
 app.use(express.json());
@@ -34,5 +37,6 @@ app.use("/api/rentals", rentalRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/provider", providerRoutes);
+app.use("/api/payments", paymentRoutes)
 
 export default app;
